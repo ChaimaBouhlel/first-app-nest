@@ -1,15 +1,9 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  NotFoundException,
-  Param,
-  Post, Put
-} from "@nestjs/common";
-import { Todo } from "./entities/todo.entity";
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from "@nestjs/common";
+import { Todo } from "./models/todo.model";
 import { v1 as uuidv1 } from "uuid";
 import { TodoStatusEnum } from "../enums/todo-status.enum";
+import { AddTodoDto } from "./dto/add-todo.dto";
+import { UpdateTodoDto } from "./dto/update-todo.dto";
 
 @Controller("todo")
 export class TodoController {
@@ -26,27 +20,29 @@ export class TodoController {
   @Get("/:id")
   getTodoById(@Param("id") id) {
     console.log("get todo by id");
-    console.log(id);
     const todo = this.todos.find((actualTodo) => actualTodo.id == id);
     if (todo) return todo;
     throw new NotFoundException(`Todo of id ${id} does not exist`);
   }
 
   @Post()
-  addTodo(@Body() newTodo: Todo) {
-    console.log("add todo list");
-    newTodo.createdAt = new Date();
-    newTodo.id = uuidv1();
-    newTodo.status = TodoStatusEnum.waiting;
-    this.todos.push(newTodo);
-    console.log(newTodo);
+  addTodo(@Body() newTodo: AddTodoDto) {
+    console.log("add todo");
+    const { name, description } = newTodo;
+    const todo = new Todo(
+      uuidv1(),
+      name,
+      description,
+      new Date(),
+      TodoStatusEnum.waiting
+    );
+    this.todos.push(todo);
     return this.todos;
   }
 
   @Delete("/:id")
   deleteTodo(@Param("id") id) {
     console.log("delete todo by id");
-    console.log(id);
     const index = this.todos.findIndex((todo) => todo.id === id);
     if (index >= 0) {
       this.todos.splice(index, 1);
@@ -57,7 +53,7 @@ export class TodoController {
   }
 
   @Put("/:id")
-  updateTodo(@Param("id") id, @Body() newTodo: Todo) {
+  updateTodo(@Param("id") id, @Body() newTodo: UpdateTodoDto) {
     const todo = this.getTodoById(id);
     todo.description = newTodo.description
       ? newTodo.description
