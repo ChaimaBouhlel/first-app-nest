@@ -1,6 +1,9 @@
+import { TodoStatusEnum } from '../../enums/todo-status.enum';
 
-export class Todo{
+export class Todo {
   id: number;
   name: string;
   description: string;
+  createdAt: Date;
+  status: TodoStatusEnum;
 }
