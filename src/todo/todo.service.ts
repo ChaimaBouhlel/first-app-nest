@@ -1,7 +1,6 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { Todo } from "./models/todo.model";
 import { AddTodoDto } from "./dto/add-todo.dto";
-import { v1 as uuidv1 } from "uuid";
 import { TodoStatusEnum } from "../enums/todo-status.enum";
 import { UpdateTodoDto } from "./dto/update-todo.dto";
 
@@ -9,7 +8,7 @@ import { UpdateTodoDto } from "./dto/update-todo.dto";
 export class TodoService {
   todos: Todo[];
 
-  constructor() {
+  constructor(@Inject("uuid") private readonly uuid) {
     this.todos = [];
   }
 
@@ -25,7 +24,7 @@ export class TodoService {
 
   addTodo(todo: AddTodoDto): Todo {
     const newTodo = new Todo(
-      uuidv1(),
+      this.uuid(),
       todo.name,
       todo.description,
       new Date(),
