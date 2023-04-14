@@ -30,7 +30,7 @@ export class TodoController {
 
   @Post()
   addTodo(@Body() newTodo: AddTodoDto) {
-    console.log("add todo");
+    console.log(newTodo instanceof AddTodoDto);
     return this.todoService.addTodo(newTodo);
   }
 
