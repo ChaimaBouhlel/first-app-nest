@@ -14,6 +14,7 @@ import { AddTodoDto } from "../dto/add-todo.dto";
 import { UpdateTodoDto } from "../dto/update-todo.dto";
 import { TodoDbService } from "./todo-db.service";
 import { SearchTodoDto } from "../dto/search-todo.dto";
+import { PaginateTodoDto } from "../dto/paginated-todo.dto";
 
 @Controller({
   path: "todo",
@@ -56,5 +57,12 @@ export class TodoDbController {
   @Get("/:id")
   getTodoById(@Param("id", ParseIntPipe) id) {
     return this.todoDbService.todoById(id);
+  }
+  @Get()
+  getAllTodosPaginated(@Query() paginateTodo: PaginateTodoDto) {
+    return this.todoDbService.getAllTodosPaginated(
+      paginateTodo.page,
+      paginateTodo.limit
+    );
   }
 }

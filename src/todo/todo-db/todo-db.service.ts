@@ -18,6 +18,7 @@ export class TodoDbService {
     @InjectRepository(TodoEntity)
     private todoRepository: Repository<TodoEntity>
   ) {}
+
   async todoById(id: number) {
     const promise = await this.todoRepository.findBy({ id: id });
     if (!promise) {
@@ -36,6 +37,7 @@ export class TodoDbService {
       );
     }
   }
+
   async deleteTodo(id: number) {
     return await this.todoRepository.delete(id);
   }
@@ -74,14 +76,37 @@ export class TodoDbService {
     if (searchCriteria) {
       if (searchCriteria.status || searchCriteria.critere) {
         return await this.todoRepository.find({
+          /* where: [
+             { name: Like(`%${searchCriteria.critere}%`) },
+             { description: Like(`%${searchCriteria.critere}%`) },
+             { status: searchCriteria.status },
+           ],*/
           where: [
-            { name: Like(`%${searchCriteria.critere}%`) },
-            { description: Like(`%${searchCriteria.critere}%`) },
-            { status: searchCriteria.status },
+            {
+              status: searchCriteria.status,
+              name: Like(`%${searchCriteria.critere ?? ""}%`),
+            },
+            {
+              status: searchCriteria.status,
+              description: Like(`%${searchCriteria.critere ?? ""}%`),
+            },
           ],
         });
       }
     }
     return await this.todoRepository.find();
+  }
+
+  async getAllTodosPaginated(page = 1, limit = 10) {
+    const [todos, total] = await this.todoRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    return {
+      page,
+      limit,
+      total,
+      data: todos,
+    };
   }
 }
